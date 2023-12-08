@@ -1,6 +1,18 @@
 import React, { FC, useState } from "react";
-import { StyleSheet, Text, View, TextInput, Alert } from "react-native";
-import PrimaryButton from "../components/PrimaryButton";
+import {
+  StyleSheet,
+  KeyboardAvoidingView,
+  View,
+  TextInput,
+  Alert,
+  useWindowDimensions,
+  ScrollView,
+} from "react-native";
+import PrimaryButton from "../components/ui/PrimaryButton";
+import Colors from "../constans/colors";
+import Title from "../components/ui/Title";
+import Card from "../components/ui/Card";
+import InstructionText from "../components/ui/InstructionText";
 
 interface StartGameScreenProps {
   pickedNumber: any;
@@ -14,8 +26,10 @@ const StartGameScreen: FC<StartGameScreenProps> = ({ pickedNumber }) => {
   const resetHandler = () => {
     setInputNumber("");
   };
+  const { width, height } = useWindowDimensions(); // THIS IS A HOOK THAT WILL LOOK OUT THE DIMENSIONS WHEN EVER CHANGES
+  const marginTopDistance = height < 380 ? 30 : 100;
   const confirmInputHandler = () => {
-    if (!isNaN(parseInt(inputNumber)) && inputNumber.length > 0) {
+    if (!isNaN(parseInt(inputNumber)) && parseInt(inputNumber) > 0) {
       pickedNumber(inputNumber);
     } else {
       Alert.alert("Error", "Please enter a valid number", [
@@ -28,42 +42,50 @@ const StartGameScreen: FC<StartGameScreenProps> = ({ pickedNumber }) => {
       return;
     }
   };
+
   return (
-    <View style={styles.Inputcontainer}>
-      <TextInput
-        style={styles.numberInput}
-        maxLength={2}
-        keyboardType="number-pad"
-        autoCapitalize="none"
-        autoCorrect={false}
-        onChangeText={handleInputValue}
-        value={inputNumber}
-      />
-      <View style={styles.buttonContainer}>
-        <View style={styles.button}>
-          <PrimaryButton onPress={resetHandler}>Reset</PrimaryButton>
+    <ScrollView style={styles.screen}>
+      <KeyboardAvoidingView style={styles.screen} behavior="position">
+        <View style={[styles.rootContainer, { marginTop: marginTopDistance }]}>
+          <Title>DICE GAME</Title>
+          <InstructionText style={""}>Enter a number to guess</InstructionText>
+          <Card>
+            <TextInput
+              style={styles.numberInput}
+              maxLength={2}
+              keyboardType="number-pad"
+              autoCapitalize="none"
+              autoCorrect={false}
+              onChangeText={handleInputValue}
+              value={inputNumber}
+            />
+            <View style={styles.buttonContainer}>
+              <View style={styles.button}>
+                <PrimaryButton onPress={resetHandler}>Reset</PrimaryButton>
+              </View>
+              <View style={styles.button}>
+                <PrimaryButton onPress={confirmInputHandler}>
+                  Confirm
+                </PrimaryButton>
+              </View>
+            </View>
+          </Card>
         </View>
-        <View style={styles.button}>
-          <PrimaryButton onPress={confirmInputHandler}>Confirm</PrimaryButton>
-        </View>
-      </View>
-    </View>
+      </KeyboardAvoidingView>
+    </ScrollView>
   );
 };
+
 const styles = StyleSheet.create({
-  Inputcontainer: {
-    marginTop: 100,
-    marginHorizontal: 24,
-    padding: 16,
-    backgroundColor: "#4e0329",
-    borderRadius: 8,
-    elevation: 4, //this only works on android
-    shadowColor: "black", // this will apply the shadow on IOS
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 6,
-    shadowOpacity: 0.25,
+  screen: {
+    flex: 1,
+  },
+
+  rootContainer: {
+    flex: 1,
     alignItems: "center",
   },
+
   buttonContainer: {
     flexDirection: "row",
   },
@@ -75,12 +97,16 @@ const styles = StyleSheet.create({
     height: 50,
     width: 50,
     fontSize: 32,
-    borderBottomColor: "#ddb52f",
+    borderBottomColor: Colors.accent500,
     borderBottomWidth: 2,
-    color: "#ddb52f",
+    color: Colors.accent500,
     marginVertical: 8,
     fontWeight: "bold",
     textAlign: "center",
+  },
+  instructionText: {
+    color: Colors.primary500,
+    fontSize: 24,
   },
 });
 export default StartGameScreen;
